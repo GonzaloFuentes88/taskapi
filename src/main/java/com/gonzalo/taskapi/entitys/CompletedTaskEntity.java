@@ -12,8 +12,8 @@ import jakarta.persistence.Table;
 @Table(name = "completed_tasks")
 public class CompletedTaskEntity extends TaskEntity {
 
-	@Column(name = "created_at")
-	private LocalDateTime createdAt;
+	@Column(name = "completed_at")
+	private LocalDateTime completedAt;
 
 	@Column(name = "days_delayed")
 	private Long daysDelayed;
@@ -22,12 +22,12 @@ public class CompletedTaskEntity extends TaskEntity {
 	@JoinColumn(name = "user_id")
 	private UserEntity completedBy;
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
+	public LocalDateTime getCompletedAt() {
+		return completedAt;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
+	public void setCompletedAt(LocalDateTime completedAt) {
+		this.completedAt = completedAt;
 	}
 
 	public Long getDaysDelayed() {
