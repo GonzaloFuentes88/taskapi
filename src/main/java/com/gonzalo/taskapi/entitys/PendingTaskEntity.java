@@ -21,10 +21,10 @@ public class PendingTaskEntity extends TaskEntity {
 	@Column(name = "priority_level")
 	private Integer priorityLevel;
 
-	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "task")
 	private List<ChangeLogEntity> changeLogsList;
 
-	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "task")
 	private List<InfoRequestEntity> infoRequestList;
 
 	@ManyToOne
