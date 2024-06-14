@@ -28,6 +28,10 @@ public class ChangeLogEntity {
 	@Column(name = "changed_by")
 	private String changeDescription;
 
+	@ManyToOne
+	@JoinColumn(name = "task_id")
+	private PendingTaskEntity task;
+
 	public Long getId() {
 		return id;
 	}
@@ -58,6 +62,14 @@ public class ChangeLogEntity {
 
 	public void setChangeDescription(String changeDescription) {
 		this.changeDescription = changeDescription;
+	}
+
+	public PendingTaskEntity getTask() {
+		return task;
+	}
+
+	public void setTask(PendingTaskEntity task) {
+		this.task = task;
 	}
 
 }
