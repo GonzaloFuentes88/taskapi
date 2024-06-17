@@ -10,6 +10,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
 import com.gonzalo.taskapi.modals.PageInObject;
+import com.gonzalo.taskapi.modals.entitys.CompletedTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.UserEntity;
+import com.gonzalo.taskapi.service.task.completed.dto.CompletedOutServDTO;
+import com.gonzalo.taskapi.service.task.completed.dto.UserServOutDTO;
 import com.gonzalo.taskapi.util.Constants;
 
 public class ServiceExtends {
@@ -38,6 +42,30 @@ public class ServiceExtends {
 
 	public Integer getStatusIdByValue(String value) {
 		return this.statusKey.get(value);
+	}
+
+	public UserServOutDTO getUserServ(UserEntity entity) {
+		UserServOutDTO outUserObj = new UserServOutDTO();
+		outUserObj.setId(entity.getId());
+		outUserObj.setPosition(entity.getPosition());
+		outUserObj.setRole(entity.getRole());
+		outUserObj.setEmail(entity.getEmail());
+
+		return outUserObj;
+
+	}
+
+	public CompletedOutServDTO getCompletedOutServ(CompletedTaskEntity entity) {
+		CompletedOutServDTO outObj = new CompletedOutServDTO();
+		outObj.setId(entity.getId());
+		outObj.setStatus(getStatusValueById(entity.getStatus()));
+		outObj.setCompletedBy(getUserServ(entity.getCompletedBy()));
+		outObj.setDescription(entity.getDescription());
+		outObj.setDaysDelayed(entity.getDaysDelayed());
+		outObj.setTitle(entity.getTitle());
+		outObj.setCompletedAt(entity.getCompletedAt());
+
+		return outObj;
 	}
 
 }

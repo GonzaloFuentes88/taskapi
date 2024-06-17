@@ -21,7 +21,6 @@ import com.gonzalo.taskapi.repository.IUserRepository;
 import com.gonzalo.taskapi.service.ServiceExtends;
 import com.gonzalo.taskapi.service.task.completed.dto.CompletedInServDTO;
 import com.gonzalo.taskapi.service.task.completed.dto.CompletedOutServDTO;
-import com.gonzalo.taskapi.service.task.completed.dto.UserServOutDTO;
 import com.gonzalo.taskapi.util.Constants;
 import com.gonzalo.taskapi.util.ConstantsMessages;
 
@@ -94,30 +93,6 @@ public class CompletedTaskService extends ServiceExtends implements ICompletedTa
 		pendingTask.setStatus(getStatusIdByValue(Constants.TYPE_COMPLETED));
 		pendingTaskRepository.save(pendingTask);
 
-	}
-
-	private UserServOutDTO getUserServ(UserEntity entity) {
-		UserServOutDTO outUserObj = new UserServOutDTO();
-		outUserObj.setId(entity.getId());
-		outUserObj.setPosition(entity.getPosition());
-		outUserObj.setRole(entity.getRole());
-		outUserObj.setEmail(entity.getEmail());
-
-		return outUserObj;
-
-	}
-
-	private CompletedOutServDTO getCompletedOutServ(CompletedTaskEntity entity) {
-		CompletedOutServDTO outObj = new CompletedOutServDTO();
-		outObj.setId(entity.getId());
-		outObj.setStatus(getStatusValueById(entity.getStatus()));
-		outObj.setCompletedBy(getUserServ(entity.getCompletedBy()));
-		outObj.setDescription(entity.getDescription());
-		outObj.setDaysDelayed(entity.getDaysDelayed());
-		outObj.setTitle(entity.getTitle());
-		outObj.setCompletedAt(entity.getCompletedAt());
-
-		return outObj;
 	}
 
 }
