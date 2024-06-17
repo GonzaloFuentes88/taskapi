@@ -1,6 +1,6 @@
 package com.gonzalo.taskapi.service.task.completed.dto;
 
-public class CompletedTaskServDTO {
+public class CompletedInServDTO {
 
 	private Long pendingTaskId;
 

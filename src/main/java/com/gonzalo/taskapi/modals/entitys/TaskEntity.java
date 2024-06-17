@@ -1,4 +1,4 @@
-package com.gonzalo.taskapi.entitys;
+package com.gonzalo.taskapi.modals.entitys;
 
 import java.time.LocalDateTime;
 
@@ -21,8 +21,7 @@ public class TaskEntity {
 	@Column(length = 255)
 	private String description;
 
-	@Column(length = 20)
-	private String status;
+	private Integer status;
 
 	@Column(name = "create_at")
 	private LocalDateTime createAt;
@@ -51,11 +50,11 @@ public class TaskEntity {
 		this.description = description;
 	}
 
-	public String getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 

@@ -1,4 +1,4 @@
-package com.gonzalo.taskapi.entitys;
+package com.gonzalo.taskapi.modals.entitys;
 
 import java.time.LocalDateTime;
 import java.util.List;

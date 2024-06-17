@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.gonzalo.taskapi.entitys.DeniedTaskEntity;
-import com.gonzalo.taskapi.entitys.UserEntity;
+import com.gonzalo.taskapi.modals.entitys.DeniedTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.UserEntity;
 
 @Service
 public class DeniedTaskService implements IDeniedTaskService {

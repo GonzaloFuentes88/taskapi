@@ -3,25 +3,30 @@ package com.gonzalo.taskapi.service.task.completed;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
-import com.gonzalo.taskapi.entitys.CompletedTaskEntity;
-import com.gonzalo.taskapi.entitys.PendingTaskEntity;
-import com.gonzalo.taskapi.entitys.UserEntity;
 import com.gonzalo.taskapi.errors.exceptions.TaskNotFoundException;
 import com.gonzalo.taskapi.errors.exceptions.UserNotFoundException;
+import com.gonzalo.taskapi.modals.PageInObject;
+import com.gonzalo.taskapi.modals.entitys.CompletedTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.PendingTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.UserEntity;
 import com.gonzalo.taskapi.repository.ICompletedTaskRepository;
 import com.gonzalo.taskapi.repository.IPendingTaskRepository;
 import com.gonzalo.taskapi.repository.IUserRepository;
-import com.gonzalo.taskapi.service.task.completed.dto.CompletedTaskServDTO;
+import com.gonzalo.taskapi.service.ServiceExtends;
+import com.gonzalo.taskapi.service.task.completed.dto.CompletedInServDTO;
+import com.gonzalo.taskapi.service.task.completed.dto.CompletedOutServDTO;
+import com.gonzalo.taskapi.service.task.completed.dto.UserServOutDTO;
 import com.gonzalo.taskapi.util.Constants;
 import com.gonzalo.taskapi.util.ConstantsMessages;
 
 @Service
-public class CompletedTaskService implements ICompletedTaskService {
+public class CompletedTaskService extends ServiceExtends implements ICompletedTaskService {
 
 	@Autowired
 	private ICompletedTaskRepository completedTaskRepository;
@@ -33,20 +38,39 @@ public class CompletedTaskService implements ICompletedTaskService {
 	private IUserRepository userRepository;
 
 	@Override
-	public Optional<CompletedTaskEntity> findById(Long id) throws Exception {
+	public CompletedOutServDTO findById(Long id) throws Exception {
 
-		return Optional.ofNullable(completedTaskRepository.findById(id)
+		CompletedTaskEntity taskDB = completedTaskRepository.findById(id)
 				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
-						.replace("{0}", Constants.TYPE_COMPLETED).replace("{1}", id.toString()))));
+						.replace("{0}", Constants.TYPE_COMPLETED).replace("{1}", id.toString())));
+
+		return getCompletedOutServ(taskDB);
 	}
 
 	@Override
-	public List<CompletedTaskEntity> findAllByUserId(Long id) {
-		return completedTaskRepository.findAllByCompletedBy(id);
+	public List<CompletedOutServDTO> findAllByUserId(Long id) {
+		return completedTaskRepository.findAllByCompletedBy(id).stream().map(this::getCompletedOutServ).toList();
 	}
 
 	@Override
-	public void completeTask(CompletedTaskServDTO completedTask) throws Exception {
+	public List<CompletedOutServDTO> findAll() {
+		return completedTaskRepository.findAll().stream().map(this::getCompletedOutServ).toList();
+	}
+
+	@Override
+	public Page<CompletedOutServDTO> findAllPage(PageInObject pageIn) {
+		return new PageImpl<>(completedTaskRepository.findAll(preparePageable(pageIn)).stream()
+				.map(this::getCompletedOutServ).toList());
+	}
+
+	@Override
+	public Page<CompletedOutServDTO> findAllPageByUserId(Long id, PageInObject pageIn) {
+		return new PageImpl<>(completedTaskRepository.findAllByCompletedBy(id, preparePageable(pageIn)).stream()
+				.map(this::getCompletedOutServ).toList());
+	}
+
+	@Override
+	public void completeTask(CompletedInServDTO completedTask) throws Exception {
 		CompletedTaskEntity completedTaskDB = new CompletedTaskEntity();
 
 		PendingTaskEntity pendingTask = pendingTaskRepository.findById(completedTask.getPendingTaskId()).orElseThrow(
@@ -67,7 +91,33 @@ public class CompletedTaskService implements ICompletedTaskService {
 		completedTaskDB.setCreateAt(pendingTask.getCreateAt());
 		completedTaskDB.setCompletedBy(user);
 		completedTaskRepository.save(completedTaskDB);
+		pendingTask.setStatus(getStatusIdByValue(Constants.TYPE_COMPLETED));
+		pendingTaskRepository.save(pendingTask);
 
+	}
+
+	private UserServOutDTO getUserServ(UserEntity entity) {
+		UserServOutDTO outUserObj = new UserServOutDTO();
+		outUserObj.setId(entity.getId());
+		outUserObj.setPosition(entity.getPosition());
+		outUserObj.setRole(entity.getRole());
+		outUserObj.setEmail(entity.getEmail());
+
+		return outUserObj;
+
+	}
+
+	private CompletedOutServDTO getCompletedOutServ(CompletedTaskEntity entity) {
+		CompletedOutServDTO outObj = new CompletedOutServDTO();
+		outObj.setId(entity.getId());
+		outObj.setStatus(getStatusValueById(entity.getStatus()));
+		outObj.setCompletedBy(getUserServ(entity.getCompletedBy()));
+		outObj.setDescription(entity.getDescription());
+		outObj.setDaysDelayed(entity.getDaysDelayed());
+		outObj.setTitle(entity.getTitle());
+		outObj.setCompletedAt(entity.getCompletedAt());
+
+		return outObj;
 	}
 
 }

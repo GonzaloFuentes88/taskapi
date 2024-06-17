@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.gonzalo.taskapi.entitys.ChangeLogEntity;
-import com.gonzalo.taskapi.entitys.InfoRequestEntity;
-import com.gonzalo.taskapi.entitys.PendingTaskEntity;
-import com.gonzalo.taskapi.entitys.UserEntity;
+import com.gonzalo.taskapi.modals.entitys.ChangeLogEntity;
+import com.gonzalo.taskapi.modals.entitys.InfoRequestEntity;
+import com.gonzalo.taskapi.modals.entitys.PendingTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.UserEntity;
 
 @Service
 public class PendingTaskService implements IPendingTaskService {

@@ -1,4 +1,4 @@
-package com.gonzalo.taskapi.entitys;
+package com.gonzalo.taskapi.modals.entitys;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,8 +35,8 @@ public class UserEntity {
 	@JoinColumn(name = "crreated_by")
 	private UserEntity createdBy;
 
-	@Column(name = "update_at")
-	private LocalDateTime updatedAt;
+//	@Column(name = "update_at")
+//	private LocalDateTime updatedAt;
 
 	@OneToMany(mappedBy = "creatorUser", fetch = FetchType.LAZY)
 	private List<PendingTaskEntity> pendingTasks;
@@ -101,13 +101,13 @@ public class UserEntity {
 		this.createdBy = createdBy;
 	}
 
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
+//	public LocalDateTime getUpdatedAt() {
+//		return updatedAt;
+//	}
+//
+//	public void setUpdatedAt(LocalDateTime updatedAt) {
+//		this.updatedAt = updatedAt;
+//	}
 
 	public List<PendingTaskEntity> getPendingTasks() {
 		return pendingTasks;

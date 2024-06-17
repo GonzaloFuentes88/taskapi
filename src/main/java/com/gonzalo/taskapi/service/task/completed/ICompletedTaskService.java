@@ -1,15 +1,23 @@
 package com.gonzalo.taskapi.service.task.completed;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.gonzalo.taskapi.entitys.CompletedTaskEntity;
-import com.gonzalo.taskapi.service.task.completed.dto.CompletedTaskServDTO;
+import org.springframework.data.domain.Page;
+
+import com.gonzalo.taskapi.modals.PageInObject;
+import com.gonzalo.taskapi.service.task.completed.dto.CompletedInServDTO;
+import com.gonzalo.taskapi.service.task.completed.dto.CompletedOutServDTO;
 
 public interface ICompletedTaskService {
-	Optional<CompletedTaskEntity> findById(Long id) throws Exception;
+	CompletedOutServDTO findById(Long id) throws Exception;
 
-	List<CompletedTaskEntity> findAllByUserId(Long id);
+	List<CompletedOutServDTO> findAll();
 
-	void completeTask(CompletedTaskServDTO completedTaskDTO) throws Exception;
+	List<CompletedOutServDTO> findAllByUserId(Long id);
+
+	Page<CompletedOutServDTO> findAllPage(PageInObject pageIn);
+
+	Page<CompletedOutServDTO> findAllPageByUserId(Long id, PageInObject pageIn);
+
+	void completeTask(CompletedInServDTO completedTaskDTO) throws Exception;
 }
