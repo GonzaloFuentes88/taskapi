@@ -19,7 +19,7 @@ public class DeniedTaskEntity extends TaskEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
-	private UserEntity denierUser;
+	private UserEntity deniedUser;
 
 	public LocalDateTime getDeniedAt() {
 		return deniedAt;
@@ -37,12 +37,12 @@ public class DeniedTaskEntity extends TaskEntity {
 		this.reason = reason;
 	}
 
-	public UserEntity getDenierUser() {
-		return denierUser;
+	public UserEntity getDeniedUser() {
+		return deniedUser;
 	}
 
-	public void setDenierUser(UserEntity denierUser) {
-		this.denierUser = denierUser;
+	public void setDeniedUser(UserEntity deniedUser) {
+		this.deniedUser = deniedUser;
 	}
 
 }

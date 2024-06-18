@@ -11,15 +11,20 @@ import org.springframework.data.domain.Sort.Direction;
 
 import com.gonzalo.taskapi.modals.PageInObject;
 import com.gonzalo.taskapi.modals.entitys.CompletedTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.DeniedTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.PendingTaskEntity;
 import com.gonzalo.taskapi.modals.entitys.UserEntity;
+import com.gonzalo.taskapi.service.dto.UserServOutDTO;
 import com.gonzalo.taskapi.service.task.completed.dto.CompletedOutServDTO;
-import com.gonzalo.taskapi.service.task.completed.dto.UserServOutDTO;
+import com.gonzalo.taskapi.service.task.denied.dto.DeniedOutServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.PendingOutServDTO;
 import com.gonzalo.taskapi.util.Constants;
 
 public class ServiceExtends {
 
 	Map<Integer, String> statusValue = Map.ofEntries(entry(0, Constants.TYPE_PENDING),
 			entry(1, Constants.TYPE_COMPLETED), entry(2, Constants.TYPE_DENIED));
+
 	Map<String, Integer> statusKey = Map.ofEntries(entry(Constants.TYPE_PENDING, 0), entry(Constants.TYPE_COMPLETED, 1),
 			entry(Constants.TYPE_DENIED, 2));
 
@@ -61,9 +66,39 @@ public class ServiceExtends {
 		outObj.setStatus(getStatusValueById(entity.getStatus()));
 		outObj.setCompletedBy(getUserServ(entity.getCompletedBy()));
 		outObj.setDescription(entity.getDescription());
+		outObj.setCreateAt(entity.getCreateAt());
 		outObj.setDaysDelayed(entity.getDaysDelayed());
 		outObj.setTitle(entity.getTitle());
 		outObj.setCompletedAt(entity.getCompletedAt());
+
+		return outObj;
+	}
+
+	public PendingOutServDTO getPendingOutServ(PendingTaskEntity entity) {
+		PendingOutServDTO outObj = new PendingOutServDTO();
+		outObj.setId(entity.getId());
+		outObj.setTitle(entity.getTitle());
+		outObj.setDescription(entity.getDescription());
+		outObj.setStatus(getStatusValueById(entity.getStatus()));
+		outObj.setCreateAt(entity.getCreateAt());
+		outObj.setDueTime(entity.getDueDate());
+		outObj.setPriorityLevel(entity.getPriorityLevel());
+		outObj.setCreatorUser(getUserServ(entity.getCreatorUser()));
+		outObj.setAssignedUser(getUserServ(entity.getAssignedUser()));
+
+		return outObj;
+	}
+
+	public DeniedOutServDTO getDeniedOutServ(DeniedTaskEntity entity) {
+		DeniedOutServDTO outObj = new DeniedOutServDTO();
+		outObj.setId(entity.getId());
+		outObj.setTitle(entity.getTitle());
+		outObj.setDescription(entity.getDescription());
+		outObj.setStatus(getStatusValueById(entity.getStatus()));
+		outObj.setCreateAt(entity.getCreateAt());
+		outObj.setDeniedAt(entity.getDeniedAt());
+		outObj.setReason(entity.getReason());
+		outObj.setDeniedUser(getUserServ(entity.getDeniedUser()));
 
 		return outObj;
 	}

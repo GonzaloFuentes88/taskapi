@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gonzalo.taskapi.errors.exceptions.TaskNotFoundException;
 import com.gonzalo.taskapi.errors.exceptions.UserNotFoundException;
@@ -19,6 +20,7 @@ import com.gonzalo.taskapi.repository.ICompletedTaskRepository;
 import com.gonzalo.taskapi.repository.IPendingTaskRepository;
 import com.gonzalo.taskapi.repository.IUserRepository;
 import com.gonzalo.taskapi.service.ServiceExtends;
+import com.gonzalo.taskapi.service.dto.UserServOutDTO;
 import com.gonzalo.taskapi.service.task.completed.dto.CompletedInServDTO;
 import com.gonzalo.taskapi.service.task.completed.dto.CompletedOutServDTO;
 import com.gonzalo.taskapi.util.Constants;
@@ -37,7 +39,8 @@ public class CompletedTaskService extends ServiceExtends implements ICompletedTa
 	private IUserRepository userRepository;
 
 	@Override
-	public CompletedOutServDTO findById(Long id) throws Exception {
+	@Transactional(readOnly = true)
+	public CompletedOutServDTO findById(Long id) {
 
 		CompletedTaskEntity taskDB = completedTaskRepository.findById(id)
 				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
@@ -47,29 +50,34 @@ public class CompletedTaskService extends ServiceExtends implements ICompletedTa
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CompletedOutServDTO> findAllByUserId(Long id) {
-		return completedTaskRepository.findAllByCompletedBy(id).stream().map(this::getCompletedOutServ).toList();
+		return completedTaskRepository.findAllByCompletedById(id).stream().map(this::getCompletedOutServ).toList();
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CompletedOutServDTO> findAll() {
 		return completedTaskRepository.findAll().stream().map(this::getCompletedOutServ).toList();
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<CompletedOutServDTO> findAllPage(PageInObject pageIn) {
 		return new PageImpl<>(completedTaskRepository.findAll(preparePageable(pageIn)).stream()
 				.map(this::getCompletedOutServ).toList());
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<CompletedOutServDTO> findAllPageByUserId(Long id, PageInObject pageIn) {
-		return new PageImpl<>(completedTaskRepository.findAllByCompletedBy(id, preparePageable(pageIn)).stream()
+		return new PageImpl<>(completedTaskRepository.findAllByCompletedById(id, preparePageable(pageIn)).stream()
 				.map(this::getCompletedOutServ).toList());
 	}
 
 	@Override
-	public void completeTask(CompletedInServDTO completedTask) throws Exception {
+	@Transactional()
+	public void completeTask(CompletedInServDTO completedTask) {
 		CompletedTaskEntity completedTaskDB = new CompletedTaskEntity();
 
 		PendingTaskEntity pendingTask = pendingTaskRepository.findById(completedTask.getPendingTaskId()).orElseThrow(
@@ -93,6 +101,15 @@ public class CompletedTaskService extends ServiceExtends implements ICompletedTa
 		pendingTask.setStatus(getStatusIdByValue(Constants.TYPE_COMPLETED));
 		pendingTaskRepository.save(pendingTask);
 
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UserServOutDTO findCompleted(Long id) {
+		CompletedTaskEntity taskDB = completedTaskRepository.findById(id).orElseThrow(
+				() -> new UserNotFoundException(ConstantsMessages.USER_NOT_FOUND.replace("{0}", id.toString())));
+
+		return getUserServ(taskDB.getCompletedBy());
 	}
 
 }

@@ -1,58 +1,176 @@
 package com.gonzalo.taskapi.service.task.pending;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.gonzalo.taskapi.errors.exceptions.TaskNotFoundException;
+import com.gonzalo.taskapi.errors.exceptions.UserNotFoundException;
+import com.gonzalo.taskapi.modals.PageInObject;
 import com.gonzalo.taskapi.modals.entitys.ChangeLogEntity;
 import com.gonzalo.taskapi.modals.entitys.InfoRequestEntity;
 import com.gonzalo.taskapi.modals.entitys.PendingTaskEntity;
 import com.gonzalo.taskapi.modals.entitys.UserEntity;
+import com.gonzalo.taskapi.repository.IChangeLogRepository;
+import com.gonzalo.taskapi.repository.IInfoRequestRepository;
+import com.gonzalo.taskapi.repository.IPendingTaskRepository;
+import com.gonzalo.taskapi.repository.IUserRepository;
+import com.gonzalo.taskapi.service.ServiceExtends;
+import com.gonzalo.taskapi.service.dto.UserServOutDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.ChangeLogInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.InfoRequestInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.PendingInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.PendingOutServDTO;
+import com.gonzalo.taskapi.util.Constants;
+import com.gonzalo.taskapi.util.ConstantsMessages;
 
 @Service
-public class PendingTaskService implements IPendingTaskService {
+public class PendingTaskService extends ServiceExtends implements IPendingTaskService {
+
+	@Autowired
+	private IPendingTaskRepository pendingTaskRepository;
+
+	@Autowired
+	private IUserRepository userRepository;
+
+	@Autowired
+	private IChangeLogRepository changeRepository;
+
+	@Autowired
+	private IInfoRequestRepository infoRequestRepository;
 
 	@Override
-	public Optional<PendingTaskEntity> findById(Long id) {
-		// TODO Auto-generated method stub
-		return Optional.empty();
+	@Transactional(readOnly = true)
+	public PendingOutServDTO findById(Long id) {
+		PendingTaskEntity taskDB = pendingTaskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(
+				ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}", id.toString())));
+		return getPendingOutServ(taskDB);
 	}
 
 	@Override
-	public Optional<UserEntity> findCreator(Long id) {
-		// TODO Auto-generated method stub
-		return Optional.empty();
+	@Transactional(readOnly = true)
+	public UserServOutDTO findCreator(Long id) {
+		// ESTE METODO DEBERIA DE BUSCAR EL CREADOR DE UNA TAREA EN ESPECIFICA
+
+		PendingTaskEntity taskDB = pendingTaskRepository.findById(id).orElseThrow(
+				() -> new UserNotFoundException(ConstantsMessages.USER_NOT_FOUND.replace("{0}", id.toString())));
+
+		return getUserServ(taskDB.getCreatorUser());
 	}
 
 	@Override
-	public List<PendingTaskEntity> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(readOnly = true)
+	public List<PendingOutServDTO> findAll() {
+		return pendingTaskRepository.findAll().stream().map(this::getPendingOutServ).toList();
 	}
 
 	@Override
-	public List<PendingTaskEntity> findAllByCreator(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(readOnly = true)
+	public List<PendingOutServDTO> findAllByCreator(Long id) {
+		return pendingTaskRepository.findAllByCreatorUserId(id).stream().map(this::getPendingOutServ).toList();
 	}
 
 	@Override
-	public void create(PendingTaskEntity pendingTask) {
-		// TODO Auto-generated method stub
+	@Transactional(readOnly = true)
+	public List<PendingOutServDTO> findAllByAssigned(Long id) {
+		return pendingTaskRepository.findAllByAssignedUserId(id).stream().map(this::getPendingOutServ).toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PendingOutServDTO> findAllPage(PageInObject pageIn) {
+		return new PageImpl<>(
+				pendingTaskRepository.findAll(preparePageable(pageIn)).stream().map(this::getPendingOutServ).toList());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PendingOutServDTO> findAllByCreatorPage(Long id, PageInObject pageIn) {
+		return new PageImpl<>(pendingTaskRepository.findAllByCreatorUserId(id, preparePageable(pageIn)).stream()
+				.map(this::getPendingOutServ).toList());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PendingOutServDTO> findAllByAssignedPage(Long id, PageInObject pageIn) {
+		return new PageImpl<>(pendingTaskRepository.findAllByAssignedUserId(id, preparePageable(pageIn)).stream()
+				.map(this::getPendingOutServ).toList());
+	}
+
+	@Override
+	@Transactional()
+	public void create(PendingInServDTO pendingTask) {
+		PendingTaskEntity entity = new PendingTaskEntity();
+		Long creatorUserId = pendingTask.getCreatorUserId();
+		Long assignedUserId = pendingTask.getAssignedUserId();
+
+		UserEntity creatorUserDB = userRepository.findById(creatorUserId).orElseThrow(() -> new UserNotFoundException(
+				ConstantsMessages.CREATOR_USER_NOT_FOUND.replace("{0}", creatorUserId.toString())));
+
+		UserEntity assignedUserDB = userRepository.findById(assignedUserId).orElseThrow(() -> new UserNotFoundException(
+				ConstantsMessages.ASSIGNED_USER_NOT_FOUND.replace("{0}", creatorUserId.toString())));
+
+		entity.setTitle(pendingTask.getTitle());
+		entity.setDescription(pendingTask.getDescription());
+		entity.setStatus(getStatusIdByValue(Constants.TYPE_PENDING));
+		entity.setCreateAt(LocalDateTime.now());
+		entity.setDueDate(pendingTask.getDueDate());
+		entity.setPriorityLevel(pendingTask.getPriorityLevel());
+		entity.setCreatorUser(creatorUserDB);
+		entity.setAssignedUser(assignedUserDB);
+
+		pendingTaskRepository.save(entity);
+	}
+
+	@Override
+	@Transactional()
+	public void addChange(ChangeLogInServDTO change) {
+		ChangeLogEntity entity = new ChangeLogEntity();
+		Long taskId = change.getTaskId();
+		Long changedById = change.getChangedById();
+
+		PendingTaskEntity taskDB = pendingTaskRepository.findById(taskId)
+				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
+						.replace("{0}", Constants.TYPE_PENDING).replace("{1}", taskId.toString())));
+
+		UserEntity creatorUserDB = userRepository.findById(changedById).orElseThrow(() -> new UserNotFoundException(
+				ConstantsMessages.USER_NOT_FOUND.replace("{0}", changedById.toString())));
+
+		entity.setChangeDescription(change.getChangeDescription());
+		entity.setTimestamp(LocalDateTime.now());
+		entity.setChangedBy(creatorUserDB);
+		entity.setTask(taskDB);
+
+		changeRepository.save(entity);
 
 	}
 
 	@Override
-	public void addChange(ChangeLogEntity change) {
-		// TODO Auto-generated method stub
+	@Transactional()
+	public void addInfo(InfoRequestInServDTO info) {
+		InfoRequestEntity entity = new InfoRequestEntity();
+		Long taskId = info.getTaskId();
+		Long infoRequestById = info.getRequestedById();
 
-	}
+		PendingTaskEntity taskDB = pendingTaskRepository.findById(taskId)
+				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
+						.replace("{0}", Constants.TYPE_PENDING).replace("{1}", taskId.toString())));
 
-	@Override
-	public void addInfo(InfoRequestEntity info) {
-		// TODO Auto-generated method stub
+		UserEntity requestByUserDB = userRepository.findById(infoRequestById)
+				.orElseThrow(() -> new UserNotFoundException(
+						ConstantsMessages.USER_NOT_FOUND.replace("{0}", infoRequestById.toString())));
 
+		entity.setMessage(info.getMessage());
+		entity.setTimestamp(LocalDateTime.now());
+		entity.setRequestedBy(requestByUserDB);
+		entity.setTask(taskDB);
+
+		infoRequestRepository.save(entity);
 	}
 
 }

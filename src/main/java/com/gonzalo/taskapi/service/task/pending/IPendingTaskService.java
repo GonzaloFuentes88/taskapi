@@ -1,27 +1,38 @@
 package com.gonzalo.taskapi.service.task.pending;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.gonzalo.taskapi.modals.entitys.ChangeLogEntity;
-import com.gonzalo.taskapi.modals.entitys.InfoRequestEntity;
-import com.gonzalo.taskapi.modals.entitys.PendingTaskEntity;
-import com.gonzalo.taskapi.modals.entitys.UserEntity;
+import org.springframework.data.domain.Page;
+
+import com.gonzalo.taskapi.modals.PageInObject;
+import com.gonzalo.taskapi.service.dto.UserServOutDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.ChangeLogInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.InfoRequestInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.PendingInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.PendingOutServDTO;
 
 public interface IPendingTaskService {
 
-	Optional<PendingTaskEntity> findById(Long id);
+	PendingOutServDTO findById(Long id);
 
-	Optional<UserEntity> findCreator(Long id);
+	UserServOutDTO findCreator(Long id);
 
-	List<PendingTaskEntity> findAll();
+	List<PendingOutServDTO> findAll();
 
-	List<PendingTaskEntity> findAllByCreator(Long id);
+	List<PendingOutServDTO> findAllByCreator(Long id);
 
-	void create(PendingTaskEntity pendingTask);
+	List<PendingOutServDTO> findAllByAssigned(Long id);
 
-	void addChange(ChangeLogEntity change);
+	Page<PendingOutServDTO> findAllPage(PageInObject pageIn);
 
-	void addInfo(InfoRequestEntity info);
+	Page<PendingOutServDTO> findAllByCreatorPage(Long id, PageInObject pageIn);
+
+	Page<PendingOutServDTO> findAllByAssignedPage(Long id, PageInObject pageIn);
+
+	void create(PendingInServDTO pendingTask);
+
+	void addChange(ChangeLogInServDTO change);
+
+	void addInfo(InfoRequestInServDTO info);
 
 }

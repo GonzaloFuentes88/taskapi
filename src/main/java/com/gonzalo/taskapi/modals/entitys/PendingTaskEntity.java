@@ -28,8 +28,12 @@ public class PendingTaskEntity extends TaskEntity {
 	private List<InfoRequestEntity> infoRequestList;
 
 	@ManyToOne
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "creator_user")
 	private UserEntity creatorUser;
+
+	@ManyToOne
+	@JoinColumn(name = "assigned_user")
+	private UserEntity assignedUser;
 
 	public LocalDateTime getDueDate() {
 		return dueDate;
@@ -59,7 +63,7 @@ public class PendingTaskEntity extends TaskEntity {
 		return infoRequestList;
 	}
 
-	public void setInfoRequesList(List<InfoRequestEntity> infoRequestList) {
+	public void setInfoRequestList(List<InfoRequestEntity> infoRequestList) {
 		this.infoRequestList = infoRequestList;
 	}
 
@@ -71,8 +75,12 @@ public class PendingTaskEntity extends TaskEntity {
 		this.creatorUser = creatorUser;
 	}
 
-	public void setInfoRequestList(List<InfoRequestEntity> infoRequestList) {
-		this.infoRequestList = infoRequestList;
+	public UserEntity getAssignedUser() {
+		return assignedUser;
+	}
+
+	public void setAssignedUser(UserEntity assignedUser) {
+		this.assignedUser = assignedUser;
 	}
 
 }

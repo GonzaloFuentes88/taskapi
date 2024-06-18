@@ -32,19 +32,19 @@ public class UserEntity {
 	private LocalDateTime createdAt;
 
 	@ManyToOne
-	@JoinColumn(name = "crreated_by")
+	@JoinColumn(name = "created_by")
 	private UserEntity createdBy;
 
-//	@Column(name = "update_at")
-//	private LocalDateTime updatedAt;
-
-	@OneToMany(mappedBy = "creatorUser", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "assignedUser", fetch = FetchType.LAZY)
 	private List<PendingTaskEntity> pendingTasks;
+
+	@OneToMany(mappedBy = "assignedUser", fetch = FetchType.LAZY)
+	private List<PendingTaskEntity> pendingTasksCreated;
 
 	@OneToMany(mappedBy = "completedBy", fetch = FetchType.LAZY)
 	private List<CompletedTaskEntity> completedTasks;
 
-	@OneToMany(mappedBy = "denierUser", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "deniedUser", fetch = FetchType.LAZY)
 	private List<DeniedTaskEntity> deniedTasks;
 
 	private Double performance;
@@ -101,13 +101,29 @@ public class UserEntity {
 		this.createdBy = createdBy;
 	}
 
-//	public LocalDateTime getUpdatedAt() {
-//		return updatedAt;
-//	}
-//
-//	public void setUpdatedAt(LocalDateTime updatedAt) {
-//		this.updatedAt = updatedAt;
-//	}
+	public List<PendingTaskEntity> getPendingTasksCreated() {
+		return pendingTasksCreated;
+	}
+
+	public void setPendingTasksCreated(List<PendingTaskEntity> pendingTasksCreated) {
+		this.pendingTasksCreated = pendingTasksCreated;
+	}
+
+	public List<ChangeLogEntity> getChangeLogsMade() {
+		return changeLogsMade;
+	}
+
+	public void setChangeLogsMade(List<ChangeLogEntity> changeLogsMade) {
+		this.changeLogsMade = changeLogsMade;
+	}
+
+	public List<InfoRequestEntity> getInfoRequestMade() {
+		return infoRequestMade;
+	}
+
+	public void setInfoRequestMade(List<InfoRequestEntity> infoRequestMade) {
+		this.infoRequestMade = infoRequestMade;
+	}
 
 	public List<PendingTaskEntity> getPendingTasks() {
 		return pendingTasks;

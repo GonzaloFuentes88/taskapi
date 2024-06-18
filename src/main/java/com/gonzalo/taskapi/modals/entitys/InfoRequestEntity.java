@@ -62,4 +62,12 @@ public class InfoRequestEntity {
 		this.timestamp = timestamp;
 	}
 
+	public PendingTaskEntity getTask() {
+		return task;
+	}
+
+	public void setTask(PendingTaskEntity task) {
+		this.task = task;
+	}
+
 }

@@ -1,0 +1,2 @@
+INSERT INTO users (performance, created_at, email, position, role) VALUES (5,NOW(),'email@email.com', 'position1', 'ADMIN');
+INSERT INTO users (performance, created_at,created_by, email, position, role) VALUES (5,NOW(),1,'email@email.com', 'position1', 'ADMIN');

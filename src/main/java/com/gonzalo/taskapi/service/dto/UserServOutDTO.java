@@ -1,4 +1,4 @@
-package com.gonzalo.taskapi.service.task.completed.dto;
+package com.gonzalo.taskapi.service.dto;
 
 public class UserServOutDTO {
 

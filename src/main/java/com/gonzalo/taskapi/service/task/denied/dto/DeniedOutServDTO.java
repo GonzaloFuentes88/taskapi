@@ -1,10 +1,10 @@
-package com.gonzalo.taskapi.service.task.completed.dto;
+package com.gonzalo.taskapi.service.task.denied.dto;
 
 import java.time.LocalDateTime;
 
 import com.gonzalo.taskapi.service.dto.UserServOutDTO;
 
-public class CompletedOutServDTO {
+public class DeniedOutServDTO {
 
 	private Long id;
 
@@ -14,13 +14,13 @@ public class CompletedOutServDTO {
 
 	private String status;
 
-	private LocalDateTime completedAt;
-
 	private LocalDateTime createAt;
 
-	private Long daysDelayed;
+	private LocalDateTime deniedAt;
 
-	private UserServOutDTO completedBy;
+	private String reason;
+
+	private UserServOutDTO deniedUser;
 
 	public Long getId() {
 		return id;
@@ -54,14 +54,6 @@ public class CompletedOutServDTO {
 		this.status = status;
 	}
 
-	public LocalDateTime getCompletedAt() {
-		return completedAt;
-	}
-
-	public void setCompletedAt(LocalDateTime completedAt) {
-		this.completedAt = completedAt;
-	}
-
 	public LocalDateTime getCreateAt() {
 		return createAt;
 	}
@@ -70,20 +62,28 @@ public class CompletedOutServDTO {
 		this.createAt = createAt;
 	}
 
-	public Long getDaysDelayed() {
-		return daysDelayed;
+	public LocalDateTime getDeniedAt() {
+		return deniedAt;
 	}
 
-	public void setDaysDelayed(Long daysDelayed) {
-		this.daysDelayed = daysDelayed;
+	public void setDeniedAt(LocalDateTime deniedAt) {
+		this.deniedAt = deniedAt;
 	}
 
-	public UserServOutDTO getCompletedBy() {
-		return completedBy;
+	public String getReason() {
+		return reason;
 	}
 
-	public void setCompletedBy(UserServOutDTO completedBy) {
-		this.completedBy = completedBy;
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public UserServOutDTO getDeniedUser() {
+		return deniedUser;
+	}
+
+	public void setDeniedUser(UserServOutDTO deniedUser) {
+		this.deniedUser = deniedUser;
 	}
 
 }

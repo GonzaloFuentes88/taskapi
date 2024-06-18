@@ -1,21 +1,28 @@
 package com.gonzalo.taskapi.service.task.denied;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.gonzalo.taskapi.modals.entitys.DeniedTaskEntity;
-import com.gonzalo.taskapi.modals.entitys.UserEntity;
+import org.springframework.data.domain.Page;
+
+import com.gonzalo.taskapi.modals.PageInObject;
+import com.gonzalo.taskapi.service.dto.UserServOutDTO;
+import com.gonzalo.taskapi.service.task.denied.dto.DeniedInServDTO;
+import com.gonzalo.taskapi.service.task.denied.dto.DeniedOutServDTO;
 
 public interface IDeniedTaskService {
 
-	Optional<DeniedTaskEntity> findById(Long id);
+	DeniedOutServDTO findById(Long id);
 
-	Optional<UserEntity> findDeniedUser(Long id);
+	UserServOutDTO findDeniedUser(Long id);
 
-	List<DeniedTaskEntity> findAll();
+	List<DeniedOutServDTO> findAll();
 
-	List<DeniedTaskEntity> findAllByDenierUser(Long id);
+	List<DeniedOutServDTO> findAllByDeniedUser(Long id);
 
-	void denied(DeniedTaskEntity deniedTask);
+	Page<DeniedOutServDTO> findAllPage(PageInObject pageIn);
+
+	Page<DeniedOutServDTO> findAllByDeniedUserPage(Long id, PageInObject pageIn);
+
+	void denied(DeniedInServDTO deniedTask);
 
 }
