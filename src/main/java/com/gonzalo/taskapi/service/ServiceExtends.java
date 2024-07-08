@@ -10,13 +10,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
 import com.gonzalo.taskapi.modals.PageInObject;
+import com.gonzalo.taskapi.modals.entitys.ChangeLogEntity;
 import com.gonzalo.taskapi.modals.entitys.CompletedTaskEntity;
 import com.gonzalo.taskapi.modals.entitys.DeniedTaskEntity;
+import com.gonzalo.taskapi.modals.entitys.InfoRequestEntity;
 import com.gonzalo.taskapi.modals.entitys.PendingTaskEntity;
 import com.gonzalo.taskapi.modals.entitys.UserEntity;
 import com.gonzalo.taskapi.service.dto.UserServOutDTO;
 import com.gonzalo.taskapi.service.task.completed.dto.CompletedOutServDTO;
 import com.gonzalo.taskapi.service.task.denied.dto.DeniedOutServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.ChangeLogOutServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.InfoRequestOutServDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.PendingOutServDTO;
 import com.gonzalo.taskapi.util.Constants;
 
@@ -29,8 +33,8 @@ public class ServiceExtends {
 			entry(Constants.TYPE_DENIED, 2));
 
 	public Pageable preparePageable(PageInObject pageIn) {
-		int pageSize = pageIn.getPageSize() + 1;
-		int pageNumber = pageIn.getPageNumber();
+		int pageSize = pageIn.getPageSize();
+		int pageNumber = pageIn.getPageNumber() - 1;
 
 		Boolean sortCondition = (pageIn.getSort() != null && pageIn.getSort().isEmpty());
 		Boolean sortValueCondition = (pageIn.getSort() != null && pageIn.getSort().isEmpty());
@@ -85,6 +89,8 @@ public class ServiceExtends {
 		outObj.setPriorityLevel(entity.getPriorityLevel());
 		outObj.setCreatorUser(getUserServ(entity.getCreatorUser()));
 		outObj.setAssignedUser(getUserServ(entity.getAssignedUser()));
+		outObj.setChangeLogsList(entity.getChangeLogsList().stream().map(this::getChangeLog).toList());
+		outObj.setInfoRequestList(entity.getInfoRequestList().stream().map(this::getInfoRequest).toList());
 
 		return outObj;
 	}
@@ -101,6 +107,33 @@ public class ServiceExtends {
 		outObj.setDeniedUser(getUserServ(entity.getDeniedUser()));
 
 		return outObj;
+	}
+
+	private ChangeLogOutServDTO getChangeLog(ChangeLogEntity changeLogDB) {
+		ChangeLogOutServDTO outObj = new ChangeLogOutServDTO();
+		outObj.setId(changeLogDB.getId());
+		outObj.setChangeDescription(changeLogDB.getChangeDescription());
+		outObj.setChangedBy(getUserServ(changeLogDB.getChangedBy()));
+		outObj.setTaskId(changeLogDB.getTask().getId());
+		outObj.setTimestamp(changeLogDB.getTimestamp());
+
+		return outObj;
+	}
+
+	private InfoRequestOutServDTO getInfoRequest(InfoRequestEntity infoRequestDB) {
+		InfoRequestOutServDTO outObj = new InfoRequestOutServDTO();
+		outObj.setId(infoRequestDB.getId());
+		outObj.setMessage(infoRequestDB.getMessage());
+		outObj.setRequestedBy(getUserServ(infoRequestDB.getRequestedBy()));
+		outObj.setTaskId(infoRequestDB.getTask().getId());
+		outObj.setTimestamp(infoRequestDB.getTimestamp());
+
+		return outObj;
+	}
+
+	public String getMethodName() {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		return stackTrace[4].getMethodName();
 	}
 
 }

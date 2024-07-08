@@ -2,13 +2,12 @@ package com.gonzalo.taskapi.service.task.pending;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-
 import com.gonzalo.taskapi.modals.PageInObject;
 import com.gonzalo.taskapi.service.dto.UserServOutDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.ChangeLogInServDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.InfoRequestInServDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.PendingInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.PendingOutPageServDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.PendingOutServDTO;
 
 public interface IPendingTaskService {
@@ -23,11 +22,11 @@ public interface IPendingTaskService {
 
 	List<PendingOutServDTO> findAllByAssigned(Long id);
 
-	Page<PendingOutServDTO> findAllPage(PageInObject pageIn);
+	PendingOutPageServDTO findAllPage(PageInObject pageIn);
 
-	Page<PendingOutServDTO> findAllByCreatorPage(Long id, PageInObject pageIn);
+	PendingOutPageServDTO findAllByCreatorPage(Long id, PageInObject pageIn);
 
-	Page<PendingOutServDTO> findAllByAssignedPage(Long id, PageInObject pageIn);
+	PendingOutPageServDTO findAllByAssignedPage(Long id, PageInObject pageIn);
 
 	void create(PendingInServDTO pendingTask);
 

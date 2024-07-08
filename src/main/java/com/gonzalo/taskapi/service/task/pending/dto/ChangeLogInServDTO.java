@@ -1,24 +1,12 @@
 package com.gonzalo.taskapi.service.task.pending.dto;
 
-import java.time.LocalDateTime;
-
 public class ChangeLogInServDTO {
-
-	private LocalDateTime timestamp;
 
 	private Long changedById;
 
 	private String changeDescription;
 
 	private Long taskId;
-
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
 
 	public Long getChangedById() {
 		return changedById;

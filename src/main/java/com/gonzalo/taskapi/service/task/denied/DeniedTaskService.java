@@ -40,8 +40,11 @@ public class DeniedTaskService extends ServiceExtends implements IDeniedTaskServ
 	@Override
 	@Transactional(readOnly = true)
 	public DeniedOutServDTO findById(Long id) {
-		DeniedTaskEntity entity = deniedTaksRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(
-				ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}", id.toString())));
+		DeniedTaskEntity entity = deniedTaksRepository.findById(id).orElseThrow(() -> {
+			String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}",
+					id.toString());
+			return new TaskNotFoundException(message, "id", getMethodName());
+		});
 		return getDeniedOutServ(entity);
 	}
 
@@ -49,8 +52,12 @@ public class DeniedTaskService extends ServiceExtends implements IDeniedTaskServ
 	@Transactional(readOnly = true)
 	public UserServOutDTO findDeniedUser(Long id) {
 
-		DeniedTaskEntity entity = deniedTaksRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(
-				ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}", id.toString())));
+		DeniedTaskEntity entity = deniedTaksRepository.findById(id).orElseThrow(() -> {
+
+			String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}",
+					id.toString());
+			return new TaskNotFoundException(message, "id", getMethodName());
+		});
 		return getUserServ(entity.getDeniedUser());
 	}
 
@@ -87,9 +94,11 @@ public class DeniedTaskService extends ServiceExtends implements IDeniedTaskServ
 		Long pendingId = deniedTask.getTaskId();
 		Long userId = deniedTask.getDeniedUserId();
 
-		PendingTaskEntity pendingTaskDB = pendingTaskRepository.findById(pendingId)
-				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
-						.replace("{0}", Constants.TYPE_PENDING).replace("{1}", pendingId.toString())));
+		PendingTaskEntity pendingTaskDB = pendingTaskRepository.findById(pendingId).orElseThrow(() -> {
+			String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}",
+					pendingId.toString());
+			return new TaskNotFoundException(message, "pendingId", getMethodName());
+		});
 
 		UserEntity user = userRepository.findById(userId).orElseThrow(
 				() -> new UserNotFoundException(ConstantsMessages.USER_NOT_FOUND.replace("{0}", userId.toString())));

@@ -5,13 +5,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gonzalo.taskapi.errors.exceptions.TaskNotFoundException;
 import com.gonzalo.taskapi.errors.exceptions.UserNotFoundException;
 import com.gonzalo.taskapi.modals.PageInObject;
+import com.gonzalo.taskapi.modals.PageOutObject;
 import com.gonzalo.taskapi.modals.entitys.ChangeLogEntity;
 import com.gonzalo.taskapi.modals.entitys.InfoRequestEntity;
 import com.gonzalo.taskapi.modals.entitys.PendingTaskEntity;
@@ -25,6 +25,7 @@ import com.gonzalo.taskapi.service.dto.UserServOutDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.ChangeLogInServDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.InfoRequestInServDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.PendingInServDTO;
+import com.gonzalo.taskapi.service.task.pending.dto.PendingOutPageServDTO;
 import com.gonzalo.taskapi.service.task.pending.dto.PendingOutServDTO;
 import com.gonzalo.taskapi.util.Constants;
 import com.gonzalo.taskapi.util.ConstantsMessages;
@@ -47,8 +48,11 @@ public class PendingTaskService extends ServiceExtends implements IPendingTaskSe
 	@Override
 	@Transactional(readOnly = true)
 	public PendingOutServDTO findById(Long id) {
-		PendingTaskEntity taskDB = pendingTaskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(
-				ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}", id.toString())));
+		PendingTaskEntity taskDB = pendingTaskRepository.findById(id).orElseThrow(() -> {
+			String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}",
+					id.toString());
+			return new TaskNotFoundException(message, "id", getMethodName());
+		});
 		return getPendingOutServ(taskDB);
 	}
 
@@ -83,23 +87,59 @@ public class PendingTaskService extends ServiceExtends implements IPendingTaskSe
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<PendingOutServDTO> findAllPage(PageInObject pageIn) {
-		return new PageImpl<>(
-				pendingTaskRepository.findAll(preparePageable(pageIn)).stream().map(this::getPendingOutServ).toList());
+	public PendingOutPageServDTO findAllPage(PageInObject pageIn) {
+		PendingOutPageServDTO outObj = new PendingOutPageServDTO();
+		PageOutObject pageOut = new PageOutObject();
+		Page<PendingTaskEntity> page = pendingTaskRepository.findAll(preparePageable(pageIn));
+		List<PendingOutServDTO> list = page.stream().map(this::getPendingOutServ).toList();
+
+		pageOut.setTotalPages(Long.valueOf(page.getTotalPages()));
+		pageOut.setPageSize(Long.valueOf(page.getSize()));
+		pageOut.setPageNumber(page.getNumber() + 1L);
+		pageOut.setTotalElements(Long.valueOf(page.getTotalElements()));
+
+		outObj.setPendingList(list);
+		outObj.setPageOut(pageOut);
+
+		return outObj;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<PendingOutServDTO> findAllByCreatorPage(Long id, PageInObject pageIn) {
-		return new PageImpl<>(pendingTaskRepository.findAllByCreatorUserId(id, preparePageable(pageIn)).stream()
-				.map(this::getPendingOutServ).toList());
+	public PendingOutPageServDTO findAllByCreatorPage(Long id, PageInObject pageIn) {
+		PendingOutPageServDTO outObj = new PendingOutPageServDTO();
+		PageOutObject pageOut = new PageOutObject();
+		Page<PendingTaskEntity> page = pendingTaskRepository.findAllByCreatorUserId(id, preparePageable(pageIn));
+		List<PendingOutServDTO> list = page.stream().map(this::getPendingOutServ).toList();
+
+		pageOut.setTotalPages(Long.valueOf(page.getTotalPages()));
+		pageOut.setPageSize(Long.valueOf(page.getSize()));
+		pageOut.setPageNumber(Long.valueOf(page.getNumber()));
+		pageOut.setTotalElements(Long.valueOf(page.getTotalElements()));
+
+		outObj.setPendingList(list);
+		outObj.setPageOut(pageOut);
+
+		return outObj;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<PendingOutServDTO> findAllByAssignedPage(Long id, PageInObject pageIn) {
-		return new PageImpl<>(pendingTaskRepository.findAllByAssignedUserId(id, preparePageable(pageIn)).stream()
-				.map(this::getPendingOutServ).toList());
+	public PendingOutPageServDTO findAllByAssignedPage(Long id, PageInObject pageIn) {
+		PendingOutPageServDTO outObj = new PendingOutPageServDTO();
+		PageOutObject pageOut = new PageOutObject();
+		Page<PendingTaskEntity> page = pendingTaskRepository.findAllByAssignedUserId(id, preparePageable(pageIn));
+		List<PendingOutServDTO> list = page.stream().map(this::getPendingOutServ).toList();
+
+		pageOut.setTotalPages(Long.valueOf(page.getTotalPages()));
+		pageOut.setPageSize(Long.valueOf(page.getSize()));
+		pageOut.setPageNumber(Long.valueOf(page.getNumber()));
+		pageOut.setTotalElements(Long.valueOf(page.getTotalElements()));
+
+		outObj.setPendingList(list);
+		outObj.setPageOut(pageOut);
+
+		return outObj;
 	}
 
 	@Override
@@ -134,9 +174,13 @@ public class PendingTaskService extends ServiceExtends implements IPendingTaskSe
 		Long taskId = change.getTaskId();
 		Long changedById = change.getChangedById();
 
-		PendingTaskEntity taskDB = pendingTaskRepository.findById(taskId)
-				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
-						.replace("{0}", Constants.TYPE_PENDING).replace("{1}", taskId.toString())));
+		PendingTaskEntity taskDB = pendingTaskRepository.findById(taskId).orElseThrow(() -> {
+			String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}",
+					taskId.toString());
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
+			return new TaskNotFoundException(message, "id", getMethodName());
+		});
 
 		UserEntity creatorUserDB = userRepository.findById(changedById).orElseThrow(() -> new UserNotFoundException(
 				ConstantsMessages.USER_NOT_FOUND.replace("{0}", changedById.toString())));
@@ -157,9 +201,13 @@ public class PendingTaskService extends ServiceExtends implements IPendingTaskSe
 		Long taskId = info.getTaskId();
 		Long infoRequestById = info.getRequestedById();
 
-		PendingTaskEntity taskDB = pendingTaskRepository.findById(taskId)
-				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
-						.replace("{0}", Constants.TYPE_PENDING).replace("{1}", taskId.toString())));
+		PendingTaskEntity taskDB = pendingTaskRepository.findById(taskId).orElseThrow(() -> {
+			String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING).replace("{1}",
+					taskId.toString());
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
+			return new TaskNotFoundException(message, "id", getMethodName());
+		});
 
 		UserEntity requestByUserDB = userRepository.findById(infoRequestById)
 				.orElseThrow(() -> new UserNotFoundException(

@@ -42,9 +42,11 @@ public class CompletedTaskService extends ServiceExtends implements ICompletedTa
 	@Transactional(readOnly = true)
 	public CompletedOutServDTO findById(Long id) {
 
-		CompletedTaskEntity taskDB = completedTaskRepository.findById(id)
-				.orElseThrow(() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND
-						.replace("{0}", Constants.TYPE_COMPLETED).replace("{1}", id.toString())));
+		CompletedTaskEntity taskDB = completedTaskRepository.findById(id).orElseThrow(() -> {
+			String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_COMPLETED).replace("{1}",
+					id.toString());
+			return new TaskNotFoundException(message, "id", getMethodName());
+		});
 
 		return getCompletedOutServ(taskDB);
 	}
@@ -80,9 +82,12 @@ public class CompletedTaskService extends ServiceExtends implements ICompletedTa
 	public void completeTask(CompletedInServDTO completedTask) {
 		CompletedTaskEntity completedTaskDB = new CompletedTaskEntity();
 
-		PendingTaskEntity pendingTask = pendingTaskRepository.findById(completedTask.getPendingTaskId()).orElseThrow(
-				() -> new TaskNotFoundException(ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING)
-						.replace("{1}", completedTask.getPendingTaskId().toString())));
+		PendingTaskEntity pendingTask = pendingTaskRepository.findById(completedTask.getPendingTaskId())
+				.orElseThrow(() -> {
+					String message = ConstantsMessages.TASK_NOT_FOUND.replace("{0}", Constants.TYPE_PENDING)
+							.replace("{1}", completedTask.getPendingTaskId().toString());
+					return new TaskNotFoundException(message, "id", getMethodName());
+				});
 
 		UserEntity user = userRepository.findById(completedTask.getUserCompletedId())
 				.orElseThrow(() -> new UserNotFoundException(ConstantsMessages.USER_NOT_FOUND.replace("{0}",
